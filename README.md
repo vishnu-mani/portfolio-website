@@ -7,8 +7,9 @@ rails, a live CSSBattle rank, and a light/dark theme where the primary colour
 changes with the mode.
 
 **Links** · [GitHub](https://github.com/vishnu-mani) ·
+[LinkedIn](https://www.linkedin.com/in/vishnum93) ·
 [CSSBattle](https://cssbattle.dev/player/robocoder) ·
-[Current site](https://vishnu-mani.netlify.app) ·
+[HackerRank](https://www.hackerrank.com/profile/vishnum) ·
 [Email](mailto:vishnumani1993@gmail.com)
 
 ---
@@ -123,8 +124,8 @@ rather than rendered as a dead link — fill one in and it appears automatically
 const socialLinks = [
   { label: 'GitHub',     href: 'https://github.com/vishnu-mani' },
   { label: 'CSSBattle',  href: 'https://cssbattle.dev/player/robocoder' },
-  { label: 'LinkedIn',   href: null },  // <- add your profile URL
-  { label: 'HackerRank', href: null },  // <- add your profile URL
+  { label: 'LinkedIn',   href: 'https://www.linkedin.com/in/vishnum93' },
+  { label: 'HackerRank', href: 'https://www.hackerrank.com/profile/vishnum' },
   { label: 'Email',      href: `mailto:${profile.email}` },
 ]
 ```
@@ -138,11 +139,56 @@ config back to whole collections, it adds ~13 MB to the build.
 
 ## Deployment
 
-The default Nitro output is SSR and works as-is on Netlify, Vercel or any Node
-host. On SSR hosting the CSSBattle rank is genuinely live (cached one hour).
+### Vercel (recommended)
 
-Under `npm run generate` the API route is prerendered, so the rank is frozen at
-build time — rebuild to refresh it.
+Zero configuration — Vercel detects Nuxt, runs `npm run build`, and Nitro
+auto-selects its `vercel` preset from the `VERCEL` env var. There is no
+`vercel.json`, and **no environment variables are required**: the CSSBattle
+endpoint and user id are public and live in the server route.
+
+1. Push to GitHub (remote is already `vishnu-mani/portfolio-website`).
+2. On [vercel.com/new](https://vercel.com/new), import the repo.
+3. Leave every build setting at its detected default and deploy.
+
+Or from the CLI:
+
+```bash
+npx vercel          # preview deployment
+npx vercel --prod   # production
+```
+
+What the build produces (verified locally with `VERCEL=1 npm run build`):
+
+```
+.vercel/output/
+  config.json                    routes + cache headers
+  static/                        _nuxt assets, robots.txt
+  functions/
+    index.func/                  SSR page          (nodejs22.x)
+    api/cssbattle.func/          live rank proxy   (nodejs22.x)
+    __fallback.func/
+```
+
+The function runtime is pinned to `nodejs22.x` by the preset, so
+`engines.node` only affects the build step.
+
+`routeRules` in `nuxt.config.ts` adds
+`s-maxage=3600, stale-while-revalidate=86400` to `/api/cssbattle`. This matters
+on Vercel specifically: `defineCachedEventHandler` caches in-process, which on
+serverless means per-instance and lost on cold start, so the CDN is what
+actually keeps the upstream Cloud Function from being hit on every request.
+
+### Other hosts
+
+The default Nitro output is a Node server and runs anywhere:
+
+```bash
+npm run build
+node .output/server/index.mjs
+```
+
+Netlify works the same way, zero-config. Under `npm run generate` the API route
+is prerendered instead, so the rank freezes at build time — rebuild to refresh.
 
 ## Architecture notes
 
@@ -153,9 +199,6 @@ of that code.
 
 ## Known gaps
 
-- LinkedIn and HackerRank URLs are not set (see *Profile links* above). They
-  are not on the current site and could not be verified, so they are omitted
-  rather than guessed.
 - The capability tags in `useSiteData.ts` are inferred from résumé copy — the
   source site renders its skill chips client-side, so they could not be
   scraped exactly. Adjust to taste.

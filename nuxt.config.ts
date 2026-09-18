@@ -17,6 +17,15 @@ export default defineNuxtConfig({
     serverBundle: false,
     provider: 'iconify',
   },
+  routeRules: {
+    // `defineCachedEventHandler` caches in-process, which on a serverless
+    // platform means per-instance and lost on cold start. These headers let
+    // Vercel's CDN hold the response instead, so the upstream Cloud Function
+    // is hit about once an hour per region rather than once per instance.
+    '/api/cssbattle': {
+      headers: { 'cache-control': 'public, s-maxage=3600, stale-while-revalidate=86400' },
+    },
+  },
   css: ['~/assets/css/main.css'],
   app: {
     head: {
