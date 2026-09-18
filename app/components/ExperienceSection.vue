@@ -28,13 +28,7 @@ onMounted(() => {
   // Pins on touch devices too, not just desktop. `100svh` is what makes that
   // safe: it is sized to the largest browser UI, so showing/hiding the address
   // bar cannot change the pinned height mid-scroll.
-  //
-  // The `min-height` here is only a cheap pre-filter (and it makes the query
-  // re-evaluate on rotation). Whether the section ACTUALLY fits is measured
-  // below, because the tallest card's height depends on viewport width and on
-  // the bullet font size — a hardcoded threshold goes stale the moment either
-  // changes.
-  mm.add('(prefers-reduced-motion: no-preference) and (min-height: 560px)', () => {
+  const setup = () => {
     pinned.value = true
 
     let tween: gsap.core.Tween | null = null
@@ -89,7 +83,17 @@ onMounted(() => {
       tween?.scrollTrigger?.kill()
       tween?.kill()
     }
-  })
+  }
+
+  // Registered for two complementary height ranges rather than one
+  // `min-height` guard. Whether the section fits is decided at runtime below,
+  // but matchMedia only re-runs a callback when its query result CHANGES — so
+  // with a single always-true query, rotating a phone would never re-run the
+  // fit check and a section that fitted in portrait would stay pinned (and
+  // clipped) in landscape. Splitting at 560px means any rotation crosses a
+  // boundary, tearing one down and setting the other up.
+  mm.add('(prefers-reduced-motion: no-preference) and (min-height: 560px)', setup)
+  mm.add('(prefers-reduced-motion: no-preference) and (max-height: 559px)', setup)
 
   onBeforeUnmount(() => mm.revert())
 })
@@ -464,6 +468,54 @@ onMounted(() => {
      .job`, which would otherwise make it 88vw like the rest. */
   .work.is-pinned .job--end {
     width: min(56vw, 15rem);
+  }
+}
+
+/* --- short viewports (landscape phones, ~956x440) ----------------
+   The pinned box is a fixed 100svh with `overflow: hidden`, so the header plus
+   the tallest card has to fit inside it or the runtime fit check refuses to
+   pin and the section drops to drag-scroll. At 440px tall the default layout
+   needs 544px, so this trims it to fit — same trade as the phone-pinned
+   block, driven by height instead of width. */
+@media (max-height: 560px) {
+  .work.is-pinned .work__note {
+    display: none;
+  }
+
+  .work.is-pinned .work__head {
+    gap: 0.6rem;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 14rem);
+  }
+
+  .work.is-pinned .work__title {
+    font-size: clamp(1.75rem, 3.6vw, 2.75rem);
+  }
+
+  .work.is-pinned .job {
+    padding: 1rem 1.15rem;
+    gap: 0.4rem;
+  }
+
+  .work.is-pinned .job__company {
+    font-size: clamp(1.4rem, 2.6vw, 2rem);
+  }
+
+  .work.is-pinned .job__top {
+    padding-bottom: 0.55rem;
+    margin-bottom: 0.15rem;
+  }
+
+  .work.is-pinned .job__period {
+    margin-bottom: 0.15rem;
+  }
+
+  .work.is-pinned .job__points {
+    gap: 0.4rem;
+    padding-top: 0.6rem;
+  }
+
+  .work.is-pinned .job__point {
+    line-height: 1.38;
   }
 }
 </style>

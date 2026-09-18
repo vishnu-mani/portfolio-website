@@ -208,6 +208,13 @@ Two things make that safe:
   fit it sets `pinned = false` and never creates the ScrollTrigger, so CSS
   falls back to the drag rail.
 
+  The setup function is registered for **two complementary height ranges**
+  (`min-height: 560px` and `max-height: 559px`) rather than one query.
+  matchMedia only re-runs a callback when its query result *changes*, so with a
+  single always-true query, rotating a phone would never re-run the fit check —
+  a section that fitted in portrait would stay pinned, and clipped, in
+  landscape. Splitting at 560px means every rotation crosses a boundary.
+
   This replaced a `(min-height: 560px)` media guard, which went stale the
   moment the bullet font size changed: the card's height depends on both the
   viewport width and the type size, so one number cannot describe it. At 14px
@@ -215,9 +222,21 @@ Two things make that safe:
   single threshold covers both. The query keeps a cheap `(min-height: 560px)`
   pre-filter only so it re-evaluates on rotation.
 
-To buy that fit, the phone-pinned layout drops the intro note and tightens card
-padding and leading (`.work.is-pinned` inside the `max-width: 860px` block),
-and keeps bullets at 14px where the base size is 16px.
+To buy that fit there are two compact layouts, driven by different axes:
+
+- `.work.is-pinned` inside `@media (max-width: 860px)` — portrait phones. Drops
+  the intro note, tightens card padding, and keeps bullets at 14px where the
+  base size is 16px.
+- `.work.is-pinned` inside `@media (max-height: 560px)` — landscape phones
+  (e.g. 956x440). Drops the note, shrinks the section title and company names,
+  and tightens leading. Without it the section needs 544px in a 440px viewport,
+  fails the fit check, and silently drops to drag-scroll — which is exactly how
+  it was reported as "not scrolling horizontally in landscape". With it the
+  section needs 423px and pins, giving 2178px of travel.
+
+At 440px tall the fixed site header overlaps the section heading when it is
+visible, but it auto-hides on scroll-down — which is when this section is being
+read — so in practice it clears.
 That took the section from 806px to 533px tall, so it clears a 560px viewport
 with room instead of overflowing by default.
 
