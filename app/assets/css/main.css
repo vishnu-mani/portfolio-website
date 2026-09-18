@@ -1,0 +1,258 @@
+/* ---------------------------------------------------------------
+   Design tokens
+   --------------------------------------------------------------- */
+:root {
+  /* --- palette, light (default) ------------------------------------
+     Mirrors vishnu-mani.netlify.app: the primary colour is purple in
+     light mode and the Vue green in dark mode. */
+  --bg: #f1f0ec;
+  --bg-alt: #e7e5de;
+  --fg: #202020;
+  --fg-soft: #4a4a48;
+  --fg-faint: #65655f;
+  --line: rgba(32, 32, 32, 0.14);
+
+  /* Panels that deliberately invert against the page (contact, preloader,
+     the closing role card). They flip with the theme, so the composition's
+     light/dark rhythm survives in both modes. */
+  --inv-bg: #202020;
+  --inv-fg: #f1f0ec;
+  --inv-line: rgba(241, 240, 236, 0.18);
+
+  --accent: #673ab7;
+  --accent-soft: #7a4dcc; /* hover tint on an accent fill */
+  --accent-deep: #5a32a0; /* small text on --bg */
+  --accent-inv: #ab8ae2;  /* small text on --inv-bg */
+  --on-accent: #f1f0ec;   /* text sitting on an accent fill */
+
+  /* Hero disc gradient stops, tied to the current primary colour. */
+  --disc-hi: #b79ae8;
+  --disc-lo: #45217f;
+
+  /* Constant light value for mix-blend-mode: difference. Works over both
+     themes' backgrounds, so it must NOT flip. */
+  --blend-fg: #f1f0ec;
+
+  --font-display: 'Archivo', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  --font-mono: 'DM Mono', ui-monospace, 'SF Mono', Menlo, monospace;
+
+  --gutter: clamp(1.25rem, 4vw, 4rem);
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+
+  --header-h: 4.5rem;
+
+  color-scheme: light;
+}
+
+:root.dark {
+  --bg: #202020;
+  --bg-alt: #191919;
+  --fg: #f1f0ec;
+  --fg-soft: #b9b8b2;
+  --fg-faint: #94938d;
+  --line: rgba(241, 240, 236, 0.16);
+
+  --inv-bg: #f1f0ec;
+  --inv-fg: #202020;
+  --inv-line: rgba(32, 32, 32, 0.16);
+
+  --accent: #40b883;
+  --accent-soft: #55cf99;
+  --accent-deep: #6fd6a8; /* lighter, because --bg is now dark */
+  --accent-inv: #277953;  /* darker, because --inv-bg is now light */
+  --on-accent: #202020;
+
+  --disc-hi: #8fe6c0;
+  --disc-lo: #2f8d63;
+
+  color-scheme: dark;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+  /* Must sit on <html>, NOT <body>. With `overflow-x: hidden` on the body, a
+     position:fixed element is sized to the viewport INCLUDING the scrollbar
+     gutter while the layout viewport excludes it — which pushed the mobile
+     header's menu button clean off the right edge. `clip` on the body has the
+     same problem; only moving it here makes the fixed header match the
+     document width. */
+  overflow-x: hidden;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background: var(--bg);
+  color: var(--fg);
+  transition: background-color 0.45s var(--ease-out), color 0.45s var(--ease-out);
+  font-family: var(--font-display);
+  font-weight: 500;
+  font-size: 16px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Lenis smooth scroll */
+html.lenis,
+html.lenis body {
+  height: auto;
+}
+.lenis.lenis-smooth {
+  scroll-behavior: auto !important;
+}
+.lenis.lenis-stopped {
+  overflow: hidden;
+}
+
+h1,
+h2,
+h3,
+h4,
+p,
+figure,
+ul,
+ol {
+  margin: 0;
+  padding: 0;
+}
+
+ul,
+ol {
+  list-style: none;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+button {
+  font: inherit;
+  color: inherit;
+  background: none;
+  border: 0;
+  padding: 0;
+  cursor: pointer;
+}
+
+img,
+svg,
+canvas {
+  display: block;
+  max-width: 100%;
+}
+
+::selection {
+  background: var(--accent);
+  color: var(--on-accent);
+}
+
+/* ---------------------------------------------------------------
+   Layout primitives
+   --------------------------------------------------------------- */
+.shell {
+  width: 100%;
+  max-width: 100rem;
+  margin-inline: auto;
+  padding-inline: var(--gutter);
+}
+
+.section {
+  position: relative;
+  padding-block: clamp(5rem, 12vh, 10rem);
+}
+
+.rule {
+  height: 1px;
+  width: 100%;
+  background: var(--line);
+  transform-origin: left center;
+}
+
+/* ---------------------------------------------------------------
+   Type scale
+   --------------------------------------------------------------- */
+.display {
+  font-weight: 800;
+  line-height: 0.84;
+  letter-spacing: -0.045em;
+  text-transform: uppercase;
+  font-size: clamp(3.4rem, 13.2vw, 13rem);
+}
+
+.display--md {
+  font-size: clamp(2.6rem, 8vw, 7.5rem);
+}
+
+.lede {
+  font-size: clamp(1.25rem, 2.3vw, 2.15rem);
+  line-height: 1.24;
+  letter-spacing: -0.025em;
+  font-weight: 600;
+}
+
+.body {
+  font-size: clamp(1rem, 1.15vw, 1.15rem);
+  line-height: 1.6;
+  color: var(--fg-soft);
+  font-weight: 500;
+}
+
+.meta {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--fg-faint);
+  font-weight: 400;
+}
+
+.italic-serif {
+  font-style: italic;
+  font-weight: 400;
+  letter-spacing: -0.02em;
+  text-transform: none;
+}
+
+/* ---------------------------------------------------------------
+   Reveal primitives (GSAP drives these; CSS is the pre-state)
+   --------------------------------------------------------------- */
+.line-mask {
+  display: block;
+  overflow: hidden;
+}
+
+[data-reveal] {
+  opacity: 0;
+  transform: translate3d(0, 1.75rem, 0);
+  will-change: transform, opacity;
+}
+
+.js-off [data-reveal] {
+  opacity: 1;
+  transform: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [data-reveal] {
+    opacity: 1 !important;
+    transform: none !important;
+  }
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
