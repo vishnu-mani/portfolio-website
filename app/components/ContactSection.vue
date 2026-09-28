@@ -62,7 +62,6 @@ const { $scrollTo } = useNuxtApp()
 
       <div class="contact__foot">
         <span class="meta">© {{ year }} {{ profile.name }}</span>
-        <span class="meta">Built with Nuxt 4, GSAP &amp; Lenis</span>
         <button class="to-top" type="button" data-cursor @click="$scrollTo('#top', 0)">
           <span class="to-top__arrow" aria-hidden="true">↑</span>
           <span>Back to top</span>
@@ -95,8 +94,8 @@ const { $scrollTo } = useNuxtApp()
 
 <style scoped>
 .contact {
-  background: var(--inv-bg);
-  color: var(--inv-fg);
+  background: var(--bg);
+  color: var(--fg);
   padding-bottom: clamp(2rem, 5vh, 3rem);
 }
 
@@ -108,11 +107,11 @@ const { $scrollTo } = useNuxtApp()
 
 .contact__label,
 .contact :deep(.meta) {
-  color: color-mix(in srgb, var(--inv-fg) 58%, transparent);
+  color: color-mix(in srgb, var(--fg) 58%, transparent);
 }
 
 .contact__title em {
-  color: var(--accent-inv);
+  color: var(--accent);
 }
 
 .contact__actions {
@@ -157,14 +156,14 @@ const { $scrollTo } = useNuxtApp()
   display: flex;
   flex-wrap: wrap;
   gap: 1px;
-  background: var(--inv-line);
-  border-block: 1px solid var(--inv-line);
+  background: var(--line);
+  border-block: 1px solid var(--line);
   margin-top: clamp(1rem, 4vw, 3rem);
 }
 
 .contact__socials li {
   flex: 1 1 10rem;
-  background: var(--inv-bg);
+  background: var(--bg);
 }
 
 .contact__social {
@@ -235,6 +234,6 @@ const { $scrollTo } = useNuxtApp()
   font-family: var(--font-display);
   font-size: 110px; /* user units; the viewBox scales it to the container */
   font-weight: 800;
-  fill: color-mix(in srgb, var(--inv-fg) 20%, transparent);
+  fill: color-mix(in srgb, var(--fg) 20%, transparent);
 }
 </style>

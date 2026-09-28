@@ -96,9 +96,6 @@ onMounted(() => {
         </div>
       </header>
 
-        <!-- data-lenis-prevent-horizontal: horizontal gestures here belong to
-             this rail, not to the page scroller. Vertical gestures still go to
-             Lenis, so the page scrolls normally when swiping up/down on it. -->
       <div ref="rail" class="stack__rail" data-lenis-prevent-horizontal>
         <div ref="track" class="stack__track">
           <section v-for="group in skillGroups" :key="group.id" class="panel">
@@ -263,7 +260,7 @@ onMounted(() => {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 0.7rem;
+  gap: 1.5rem;
   text-align: center;
 }
 
@@ -279,7 +276,7 @@ onMounted(() => {
 }
 
 .cell:hover .cell__logo {
-  transform: translateY(-4px) scale(1.14);
+  transform: translateY(-4px) scale(1.3);
 }
 
 :root.dark .cell--dim .cell__logo {

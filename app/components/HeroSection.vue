@@ -23,7 +23,7 @@ const play = () => {
   tl.from('.hero__char', {
     yPercent: 120,
     duration: 1.25,
-    stagger: { each: 0.018, from: 'start' },
+    stagger: { each: 0.02, from: 'start' },
   })
     .from('[data-hero-fade]', { opacity: 0, y: 18, duration: 0.9, stagger: 0.09 }, '-=0.85')
     .from(disc.value, { scale: 0.2, opacity: 0, duration: 1.4, ease: 'expo.out' }, '-=1.2')
@@ -51,13 +51,11 @@ onMounted(() => {
     ease: 'none',
     scrollTrigger: { trigger: root.value, start: 'center top', end: 'bottom top', scrub: true },
   })
+  setTimeout(() => {
+    play()
+  }, 3000)
 })
 
-watch(
-  () => props.ready,
-  (value) => value && nextTick(play),
-  { immediate: true },
-)
 
 onBeforeUnmount(() => {
   splits.forEach((split) => split.revert())
@@ -69,22 +67,19 @@ onBeforeUnmount(() => {
 
 <template>
   <section id="top" ref="root" class="hero">
-    <div ref="disc" class="hero__disc" aria-hidden="true" />
-
-    <div class="hero__top shell">
-      <p data-hero-fade class="meta hero__status">
-        <span class="hero__dot" :class="{ 'is-live': profile.available }" />
-        Available for work — {{ profile.location }}
-      </p>
-      <p data-hero-fade class="meta hero__year">© 2026 / {{ profile.handle }}</p>
+    <div ref="disc" class="hero__disc" aria-hidden="true">
+      <img src="/images/hero-pic.jpeg" alt="Vishnu M" />
     </div>
+
+    <div class="hero__top shell"></div>
 
     <div class="hero__type shell" data-hero-type>
       <h1 class="display hero__headline">
-        <span class="line-mask"><span data-split>Senior</span></span>
-        <span class="line-mask"><span data-split>Frontend</span></span>
+        <span class="line-mask hero__headline-first">
+          <span data-split>Frontend</span>
+        </span>
         <span class="line-mask hero__headline-last">
-          <span data-split>Engineer</span>
+          <span data-split>Developer</span>
           <em data-hero-fade class="italic-serif hero__since">since 2015</em>
         </span>
       </h1>
@@ -117,15 +112,18 @@ onBeforeUnmount(() => {
 .hero__disc {
   position: absolute;
   top: 8%;
-  right: -6vw;
+  right: -3vw;
   width: clamp(16rem, 34vw, 34rem);
   aspect-ratio: 1;
   border-radius: 50%;
   background: radial-gradient(circle at 32% 28%, var(--disc-hi) 0%, var(--accent) 45%, var(--disc-lo) 100%);
-  filter: blur(0.5px);
+  filter: grayscale(1);
+  transform: scaleX(-1);
   z-index: 0;
   will-change: transform;
+  overflow: hidden;
 }
+
 
 .hero__top,
 .hero__bottom {
@@ -179,6 +177,15 @@ onBeforeUnmount(() => {
 .hero__headline :deep(.hero__char) {
   display: inline-block;
   will-change: transform;
+}
+
+.hero__headline-first {
+  background: var(--accent);
+  background-color: color-mix(in srgb, var(--accent) 80%, transparent);
+  color: var(--on-accent);
+  display: inline-flex;
+  padding-right: 12px;
+  margin-bottom: 1rem;
 }
 
 .hero__headline-last {
@@ -252,8 +259,8 @@ onBeforeUnmount(() => {
     display: none;
   }
   .hero__disc {
-    top: 3%;
-    right: -26vw;
+    right: 50%;
+    transform: scaleX(-1) translateX(-50%) !important;
     width: clamp(11rem, 52vw, 18rem);
   }
 }

@@ -266,6 +266,9 @@ onMounted(() => {
 .job:hover {
   border-color: var(--accent);
 }
+.job:hover .job__company{
+  color: var(--accent);
+}
 
 .job__top {
   display: flex;

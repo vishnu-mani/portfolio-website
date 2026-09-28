@@ -110,18 +110,17 @@ onMounted(() => {
   right: 0;
   z-index: 120;
   transition: transform 0.5s var(--ease-out);
-  /* Difference blend keeps the bar legible over both the page and the inverted
-     sections. It must sit on the fixed header itself — moving it to a child
-     would blend against the header's own stacking context instead of the page. */
-  mix-blend-mode: difference;
-  color: var(--blend-fg);
+  /* mix-blend-mode: difference; */
+  background: var(--bg);
+  color: var(--fg);
 }
 
 /* The open menu sheet is opaque ink, so the blend has to come off. */
 .header.is-open {
   mix-blend-mode: normal;
-  background: var(--inv-bg);
-  color: var(--inv-fg);
+  background: var(--bg-alt);
+  color: var(--fg);
+  border-bottom: 1px solid var(--line);
 }
 
 .header.is-hidden {
@@ -214,7 +213,7 @@ onMounted(() => {
   gap: 1rem;
   margin-top: 1.25rem;
   padding: 0.85rem 1.1rem;
-  border: 1px solid var(--inv-line);
+  border: 1px solid var(--line);
   border-radius: 100px;
   font-family: var(--font-mono);
   font-size: 0.72rem;
@@ -235,8 +234,8 @@ onMounted(() => {
   flex-direction: column;
   gap: 0.25rem;
   padding: 0.5rem var(--gutter) 2.5rem;
-  background: var(--inv-bg);
-  color: var(--inv-fg);
+  background: var(--bg-alt);
+  color: var(--fg);
 }
 
 .header__sheet-link {
@@ -244,8 +243,12 @@ onMounted(() => {
   font-weight: 800;
   text-transform: uppercase;
   letter-spacing: -0.03em;
-  padding-block: 0.35rem;
-  border-bottom: 1px solid var(--inv-line);
+  padding: 0.35rem;
+  border-top: 1px solid var(--line);
+}
+
+.header__sheet-link:hover {
+  color: var(--accent);
 }
 
 .sheet-enter-active,

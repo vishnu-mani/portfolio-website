@@ -66,13 +66,13 @@ onMounted(() => {
   overflow: hidden;
   border-block: 1px solid var(--line);
   padding-block: clamp(0.85rem, 2vw, 1.5rem);
-  background: var(--bg);
+  background: var(--bg-alt);
 }
 
 .marquee--invert {
-  background: var(--inv-bg);
-  color: var(--inv-fg);
-  border-color: var(--inv-line);
+  background: var(--bg-alt);
+  color: var(--fg);
+  border-color: var(--line);
 }
 
 .marquee__skew {

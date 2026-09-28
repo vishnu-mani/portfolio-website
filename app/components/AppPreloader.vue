@@ -2,14 +2,40 @@
 const { $gsap, $reducedMotion, $lenis } = useNuxtApp()
 
 const root = ref<HTMLElement | null>(null)
-const counter = ref(0)
+const curve = ref<SVGPathElement | null>(null)
 const done = ref(false)
 
 const emit = defineEmits<{ complete: [] }>()
 
+// Shown one after the other; English lands last so the reveal ends on the
+// name the rest of the site uses.
+const names = [
+  { text: 'വിഷ്ണു', lang: 'ml' },
+  { text: 'विष्णु', lang: 'hi' },
+  { text: 'விஷ்ணு', lang: 'ta' },
+  { text: 'ವಿಷ್ಣು', lang: 'kn' },
+  { text: 'Вишну', lang: 'ru' },
+  { text: 'Βίσνου', lang: 'el' },
+  { text: 'فيشنو', lang: 'ar' },
+  { text: 'ヴィシュヌ', lang: 'ja' },
+  { text: '비슈누', lang: 'ko' },
+  { text: 'Vishnu', lang: 'en' },
+]
+
+// The curve hangs below the panel. It starts bowed and flattens as the panel
+// lifts, so the bottom edge looks like it is being dragged up.
+const CURVE_DEPTH = 300
+const CURVED = `M0 0 L1000 0 Q500 ${CURVE_DEPTH} 0 0 Z`
+const FLAT = 'M0 0 L1000 0 Q500 0 0 0 Z'
+
+const finish = () => {
+  done.value = true
+  $lenis?.start()
+  document.documentElement.classList.remove('is-loading')
+}
+
 onMounted(() => {
   if ($reducedMotion) {
-    counter.value = 100
     done.value = true
     emit('complete')
     return
@@ -18,40 +44,59 @@ onMounted(() => {
   $lenis?.stop()
   document.documentElement.classList.add('is-loading')
 
-  const progress = { value: 0 }
-  const tl = $gsap.timeline({
-    onComplete: () => {
-      done.value = true
-      $lenis?.start()
-      document.documentElement.classList.remove('is-loading')
-      emit('complete')
-    },
+  const words = root.value!.querySelectorAll<HTMLElement>('[data-preloader-word]')
+  const tl = $gsap.timeline({ onComplete: finish })
+
+  tl.from('[data-preloader-name]', { opacity: 0, y: 24, duration: 0.6, ease: 'power3.out' })
+
+  words.forEach((word, i) => {
+    const first = i === 0
+    const last = i === words.length - 1
+    // First and last names linger; the ones in between flick past.
+    const hold = first ? 0.4 : last ? 0.5 : 0.2
+    tl.set(word, { autoAlpha: 1 }, first ? 0 : '>')
+    if (!last) tl.set(word, { autoAlpha: 0 }, `>${hold}`)
+    else tl.to({}, { duration: hold })
   })
 
-  tl.to(progress, {
-    value: 100,
-    duration: 1.6,
-    ease: 'power2.inOut',
-    onUpdate: () => (counter.value = Math.round(progress.value)),
-  })
-    .to('[data-preloader-text]', { yPercent: -110, duration: 0.7, ease: 'expo.inOut' }, '-=0.1')
+  tl.to('[data-preloader-name]', { opacity: 0, y: -24, duration: 0.4, ease: 'power2.in' })
+    .addLabel('lift', '-=0.1')
     .to(
       root.value,
-      { yPercent: -100, duration: 1, ease: 'expo.inOut' },
-      '-=0.45',
+      {
+        // Clear the viewport plus the curve hanging beneath it.
+        y: () => -(window.innerHeight + CURVE_DEPTH),
+        duration: 1.1,
+        ease: 'power3.inOut',
+      },
+      'lift',
     )
+    .to(curve.value, { attr: { d: FLAT }, duration: 1.1, ease: 'power3.inOut' }, 'lift')
+    // Let the hero start its intro while the panel is still clearing it.
+    .call(() => emit('complete'), undefined, 'lift+=0.45')
 })
 </script>
 
 <template>
   <div v-show="!done" ref="root" class="preloader" aria-hidden="true">
-    <div class="preloader__inner">
-      <span data-preloader-text class="preloader__word">Vishnu&nbsp;M</span>
-      <span data-preloader-text class="preloader__word preloader__word--muted">
-        Senior Frontend Engineer
-      </span>
+    <div data-preloader-name class="preloader__name">
+      <span
+        v-for="n in names"
+        :key="n.lang"
+        data-preloader-word
+        :lang="n.lang"
+        class="preloader__word"
+      >{{ n.text }}</span>
     </div>
-    <span class="preloader__count">{{ String(counter).padStart(3, '0') }}</span>
+
+    <svg
+      class="preloader__curve"
+      viewBox="0 0 1000 300"
+      preserveAspectRatio="none"
+      :style="{ height: `${CURVE_DEPTH}px` }"
+    >
+      <path ref="curve" :d="CURVED" />
+    </svg>
   </div>
 </template>
 
@@ -62,48 +107,40 @@ onMounted(() => {
   z-index: 200;
   background: var(--inv-bg);
   color: var(--inv-fg);
-  display: flex;
-  align-items: flex-end;
-  justify-content: space-between;
-  padding: var(--gutter);
+  display: grid;
+  place-items: center;
   will-change: transform;
 }
 
-.preloader__inner {
-  display: flex;
-  flex-direction: column;
-  gap: 0.15rem;
-  overflow: hidden;
+.preloader__name {
+  display: grid;
 }
 
 .preloader__word {
-  display: block;
-  /* Scales with the viewport rather than flooring at a fixed size: the name
-     and the counter share one row, so a large floor collides on narrow
-     phones (at 375px a 2.75rem floor left 1px of clearance). */
-  font-size: clamp(1.9rem, 11vw, 6.5rem);
-  font-weight: 800;
-  letter-spacing: -0.04em;
-  line-height: 1;
+  grid-area: 1 / 1;
+  justify-self: center;
+  display: flex;
+  align-items: center;
+  gap: clamp(0.6rem, 1.5vw, 1rem);
+  visibility: hidden;
+  opacity: 0;
+  font-size: clamp(2.5rem, 9vw, 6rem);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 1.25;
+  white-space: nowrap;
   text-transform: uppercase;
-  will-change: transform;
 }
 
-.preloader__word--muted {
-  font-family: var(--font-mono);
-  /* Kept just under the name's width so it never wraps mid-phrase. */
-  font-size: clamp(0.7rem, 3.2vw, 1.25rem);
-  font-weight: 400;
-  letter-spacing: 0.18em;
-  color: var(--accent-inv);
-  padding-top: 0.75rem;
-}
-
-.preloader__count {
-  font-family: var(--font-mono);
-  font-size: clamp(1.75rem, 9vw, 5rem);
-  line-height: 1;
-  color: var(--inv-fg);
-  font-variant-numeric: tabular-nums;
+.preloader__curve {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  width: 100%;
+  display: block;
+  fill: var(--inv-bg);
+  /* Covers the hairline seam some browsers render between panel and svg. */
+  margin-top: -1px;
+  pointer-events: none;
 }
 </style>
