@@ -273,5 +273,8 @@ onMounted(() => {
   .header__role {
     display: none;
   }
+  .header__bar {
+    height: 3rem;
+  }
 }
 </style>

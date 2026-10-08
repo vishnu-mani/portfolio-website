@@ -55,6 +55,7 @@ const rankNote = computed(() => {
             :rel="stat.href ? 'noopener' : undefined"
             class="about__stat-inner"
             :data-cursor="stat.href ? 'Visit' : undefined"
+            :class="{'live': stat.isLive}"
           >
             <span class="about__stat-value">{{ stat.value }}</span>
             <span class="meta about__stat-label">
@@ -133,6 +134,9 @@ const rankNote = computed(() => {
   padding: clamp(1.25rem, 3vw, 2.25rem) clamp(0.75rem, 2vw, 1.75rem);
   height: 100%;
   transition: background 0.4s var(--ease-out);
+}
+.about__stat-inner.live {
+  color: var(--accent);
 }
 
 a.about__stat-inner:hover {

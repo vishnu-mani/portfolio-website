@@ -251,7 +251,7 @@ onMounted(() => {
      in whatever space the heading leaves. */
   flex: 1;
   align-items: center;
-  gap: 50px;
+  gap: 100px;
 }
 
 .cell {

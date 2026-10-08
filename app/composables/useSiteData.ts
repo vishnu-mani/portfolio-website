@@ -137,16 +137,16 @@ export const useSiteData = () => {
    * filtered out before render rather than shipped as a dead link. Fill one in
    * and it appears automatically, in this order.
    */
-  const socialLinks: { label: string; href: string | null }[] = [
-    { label: 'GitHub', href: 'https://github.com/vishnu-mani' },
-    { label: 'CSSBattle', href: 'https://cssbattle.dev/player/robocoder' },
-    { label: 'LinkedIn', href: 'https://www.linkedin.com/in/vishnum93' },
-    { label: 'HackerRank', href: 'https://www.hackerrank.com/profile/vishnum' },
-    { label: 'Email', href: `mailto:${profile.email}` },
+  const socialLinks: { label: string; href: string | null; icon: string }[] = [
+    { label: 'GitHub', href: 'https://github.com/vishnu-mani', icon: 'devicon:github' },
+    { label: 'CSSBattle', href: 'https://cssbattle.dev/player/robocoder', icon: 'devicon:css3' },
+    { label: 'LinkedIn', href: 'https://www.linkedin.com/in/vishnum93', icon: 'devicon:linkedin' },
+    { label: 'HackerRank', href: 'https://www.hackerrank.com/profile/vishnum', icon: 'devicon:hackerrank' },
+    { label: 'Email', href: `mailto:${profile.email}`, icon: 'devicon:gmail' },
   ]
 
   const socials = socialLinks.filter(
-    (link): link is { label: string; href: string } => Boolean(link.href),
+    (link): link is { label: string; href: string; icon: string } => Boolean(link.href),
   )
 
   const nav = [

@@ -55,7 +55,7 @@ const { $scrollTo } = useNuxtApp()
             data-cursor
           >
             {{ social.label }}
-            <span aria-hidden="true">↗</span>
+            <span aria-hidden="true" class="desktop-only">↗</span>
           </a>
         </li>
       </ul>
@@ -234,6 +234,6 @@ const { $scrollTo } = useNuxtApp()
   font-family: var(--font-display);
   font-size: 110px; /* user units; the viewBox scales it to the container */
   font-weight: 800;
-  fill: color-mix(in srgb, var(--fg) 20%, transparent);
+  fill: color-mix(in srgb, var(--fg) 5%, transparent);
 }
 </style>

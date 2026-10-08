@@ -72,6 +72,7 @@ onBeforeUnmount(() => {
     </div>
 
     <div class="hero__top shell"></div>
+    <div class="hero__top shell md-hidden"></div>
 
     <div class="hero__type shell" data-hero-type>
       <h1 class="display hero__headline">
@@ -114,6 +115,7 @@ onBeforeUnmount(() => {
   top: 8%;
   right: -3vw;
   width: clamp(16rem, 34vw, 34rem);
+  height: clamp(16rem, 34vw, 34rem);
   aspect-ratio: 1;
   border-radius: 50%;
   background: radial-gradient(circle at 32% 28%, var(--disc-hi) 0%, var(--accent) 45%, var(--disc-lo) 100%);
@@ -262,6 +264,12 @@ onBeforeUnmount(() => {
     right: 50%;
     transform: scaleX(-1) translateX(-50%) !important;
     width: clamp(11rem, 52vw, 18rem);
+    height: clamp(11rem, 52vw, 18rem);
+  }
+}
+@media (min-width: 761px) {
+  .md-hidden {
+    display: none !important;
   }
 }
 </style>
